@@ -1,0 +1,42 @@
+id,city,region,created_at,updated_at
+1,rangoon,yangon,NULL,NULL
+2,mandalay,mandalay,NULL,NULL
+3,nay pyi taw,nay pyi taw,NULL,NULL
+4,hpa-an,kayin state,NULL,NULL
+5,bago,bago,NULL,NULL
+6,myeik,taninthayi,NULL,NULL
+7,myitkyina,kachin state,NULL,NULL
+8,pathein,ayeyawady,NULL,NULL
+9,monywa,sagaing,NULL,NULL
+10,sittwe,rakhine state,NULL,NULL
+11,hinthada,ayeyawady,NULL,NULL
+12,letpandan,bago,NULL,NULL
+13,myingyan,mandalay,NULL,NULL
+14,taunggyi,shan state,NULL,NULL
+15,mudon,mon state,NULL,NULL
+16,dawei,taninthayi,NULL,NULL
+17,pyay,bago,NULL,NULL
+18,pakokku,magway,NULL,NULL
+19,magway,magway,NULL,NULL
+20,yenangyaung,magway,NULL,NULL
+21,taungoo,bago,NULL,NULL
+22,sagaing,sagaing,NULL,NULL
+23,hakha,chin state,NULL,NULL
+24,loikaw,kayah state,NULL,NULL
+25,mawlamyine,mon state,NULL,NULL
+26,chauk,magway,NULL,NULL
+27,shwebo,sagaing,NULL,NULL
+28,pyapon,ayeyawady,NULL,NULL
+29,kengtung,shan state,NULL,NULL
+30,allanmyo,magway,NULL,NULL
+31,thongwa,yangon,NULL,NULL
+32,ye,mon state,NULL,NULL
+33,wakema,ayeyawady,NULL,NULL
+34,namtu,shan state,NULL,NULL
+35,pyu,bago,NULL,NULL
+36,nyaungdon,ayeyawady,NULL,NULL
+37,amarapura,mandalay,NULL,NULL
+38,haka,sagaing,NULL,NULL
+39,kale,kayin state,NULL,NULL
+40,kyaukpyu,rakhine state,NULL,NULL
+41,labutta,ayeyawady,NULL,NULL

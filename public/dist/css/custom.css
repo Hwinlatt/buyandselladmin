@@ -1,0 +1,24 @@
+.pointer {
+    cursor: pointer;
+}
+
+.img-70 {
+    width: 70px;
+    height: 70px;
+}
+
+.glassEffect {
+    /* From https://css.glass */
+    background: rgba(99, 89, 89, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6.4px);
+    -webkit-backdrop-filter: blur(6.4px);
+    border: 1px solid rgba(99, 89, 89, 0.3);
+}
+
+.login-register-logo{
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+}
