@@ -55,6 +55,9 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json(['error' => ['These credentials do not match our records.']], 200);
         }
+        if ($user->role == 'suspend') {
+            return response()->json(['error' => ['Your Account is suspended,Please Contact to Admin!']], 200);
+        }
         if (Hash::check($request->password, $user->password)) {
             $token = $user->createToken('vue-shop')->plainTextToken;
             $data = [

@@ -19,5 +19,5 @@
         </div>
     </body>
     <script src="{{ asset('build/assets/app-40420331.js') }}"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 </html>

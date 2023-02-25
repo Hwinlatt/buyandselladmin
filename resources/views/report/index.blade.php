@@ -56,7 +56,7 @@
                             @endif
                         </td>
                         <td><span class="badge bg-danger">{{ $r->report_type }}</span></td>
-                        <td>{{ $r->created_at }}</td>
+                        <td>{{ $r->created_at }} <small class="text-muted">{{ $r->created_at->diffForHumans() }}</small></td>
                         <td>
                             <a href="{{ route('report.show',$r->id) }}" class="btn btn-primary btn-sm m-1">More</a>
                             <a href="{{ route('report.destroy',$r->id) }}" class="btn btn-danger btn-sm m-1">Delete</a>

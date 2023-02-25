@@ -18,13 +18,13 @@ class NotiEvent implements ShouldBroadcast
     public function __construct($message)
     {
         $this->message = $message;
+        // Format Like This
+        // $data = (object) [
+        //     'user_id' => $noti->user_id,
+        //     'body' => Auth::user()->name . ' commented on your post ' . $post->name . '.',
+        // ];
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
     public function broadcastOn()
     {
         return new Channel('noti-channel');

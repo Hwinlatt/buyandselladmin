@@ -23,7 +23,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 | contains the "web" middleware group. Now create something great!
 |
  */
-
+//Login User With Token
 Route::get('/', function () {
     if (Auth::user()->role == 'admin') {
         return redirect()->route('dashboard');

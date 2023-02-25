@@ -116,6 +116,12 @@ class UserController extends Controller
         }
     }
 
+    //Go To Messenger Page of Another Url Make On user Process
+    public function messenger(Request $request)
+    {
+        # code...
+    }
+
     private function imageStoreProcess($path,$request){
         if (File::exists($path)) {
             File::delete($path);

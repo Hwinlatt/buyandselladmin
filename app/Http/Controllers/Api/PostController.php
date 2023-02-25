@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NotiEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Follow;
 use App\Models\Like;
 use App\Models\Post;
+use App\Models\ReviewUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,7 +35,7 @@ class PostController extends Controller
             ->orderBy('id', 'desc')
             ->limit($limit)->get()->each(function ($post) {
             $post->images = json_decode($post->images);
-            $post->post_like_count = Like::where('post_id',$post->id)->count();
+            $post->post_like_count = Like::where('post_id', $post->id)->count();
             return $post;
         });
         return response()->json(['posts' => $posts, 'total' => $total], 200);
@@ -44,6 +48,15 @@ class PostController extends Controller
             return response()->json(['error' => $validator->errors()->all()], 200);
         }
         Post::create($this->savePost($request, null));
+        $follow_users = Follow::where('follow_to',Auth::user()->id)->get();
+        logger($follow_users);
+        foreach ($follow_users as $user) {
+            $data = (object)[
+                'user_id'=>$user->user_id,
+                'body'=>Auth::user()->name .' created a post.'
+            ];
+            event(new NotiEvent(json_encode($data)));
+        }
         return response()->json(['success' => 'Post Create Successful.'], 200);
     }
 
@@ -51,13 +64,14 @@ class PostController extends Controller
     {
         $post = Post::where('id', $id)->get()->each(function ($post) {
             $post->images = json_decode($post->images);
-            $post->post_like_count = Like::where('post_id',$post->id)->count();
+            $post->post_like_count = Like::where('post_id', $post->id)->count();
             $like = Like::where('post_id', $post->id)->where('user_id', Auth::user()->id)->first();
             if ($like) {
                 $post->like = true;
             } else {
                 $post->like = false;
             }
+            $post->additional = json_decode($post->additional);
             return $post;
         });
         if (Auth::user()->id != $post[0]->user_id) {
@@ -76,6 +90,7 @@ class PostController extends Controller
     {
         $post = Post::where('id', $id)->where('user_id', Auth::user()->id)->get()->each(function ($post) {
             $post->images = json_decode($post->images);
+            $post->additional = json_decode($post->additional);
             return $post;
         });
         if (count($post) > 0) {
@@ -142,6 +157,8 @@ class PostController extends Controller
         if (strlen($key) > 0) {
             $posts = Post::select('posts.*', 'users.region as region', 'users.city as city')->join('users', 'posts.user_id', 'users.id')
                 ->where('posts.user_id', '!=', Auth::user()->id)
+                ->where('posts.status','1')
+                ->where('users.role','user')
                 ->where(function ($query) use ($key) {
                     $query->where('posts.name', 'like', '%' . $key . '%');
                     $query->orWhere('posts.additional', 'like', '%' . $key . '%');
@@ -157,7 +174,19 @@ class PostController extends Controller
                 }
                 return $post;
             });
-            return response()->json($posts, 200);
+            $users = User::select('name', 'id', 'profile_photo_path')->where('id','!=',Auth::user()->id)
+            ->where('role','user')
+            ->where(function($q) use ($key){
+                $q->where('name', 'like', '%' . $key . '%')
+                ->orWhere('description', 'like', '%' . $key . '%');
+            })->get()->each(function ($q) {
+                $q->rating = $this->average_rating($q->id);
+            });
+            $data = [
+                'posts' => $posts,
+                'users' => $users,
+            ];
+            return response()->json($data, 200);
         }
     }
 
@@ -202,7 +231,7 @@ class PostController extends Controller
         $category = Category::find($id);
         $total = Post::where('category_id', $id)->where('status', '1')->count();
         $posts = Post::where('category_id', $id)->where('status', '1')
-            ->limit($limit)->orderBy('view','desc')->get()->each(function ($post) {
+            ->limit($limit)->orderBy('view', 'desc')->get()->each(function ($post) {
             $post->images = json_decode($post->images);
             $like = Like::where('post_id', $post->id)->where('user_id', Auth::user()->id)->first();
             if ($like) {
@@ -212,7 +241,7 @@ class PostController extends Controller
             }
             return $post;
         });
-        return response()->json(['posts' => $posts, 'total' => $total,'category'=>$category], 200);
+        return response()->json(['posts' => $posts, 'total' => $total, 'category' => $category], 200);
     }
 
     private function deleteImage($filename)
@@ -264,5 +293,18 @@ class PostController extends Controller
         }
         $validator = Validator::make($request->all(), $rule);
         return $validator;
+    }
+
+    private function average_rating($id)
+    {
+        $review_count = ReviewUser::where('rate_user_id', $id)->count();
+        logger($review_count);
+        $total_rating = ReviewUser::select('rating', DB::raw('SUM(rating) as total_rate'))->where('rate_user_id', $id)
+            ->GroupBy('rate_user_id')->get();
+        if ($review_count > 0) {
+            $rate = $total_rating[0]->total_rate / $review_count;
+            return number_format($rate, 1);
+        }
+        return 0.0;
     }
 }

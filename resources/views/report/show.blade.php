@@ -94,7 +94,7 @@
                                     </tr>
                                     <tr>
                                         <td>Created at</td>
-                                        <td>{{ $report->report_user->created_at }}</td>
+                                        <td>{{ $report->report_user->created_at }} <small>{{ $report->report_user->created_at->diffForHumans() }}</small></td>
                                     </tr>
                                     <tr>
                                         <td>Action</td>
@@ -123,7 +123,7 @@
                                 <tr>
                                     <td>{{ $o_report->id }}</td>
                                     <td>{{ $o_report->report_type }}</td>
-                                    <td>{{ $o_report->created_at }}</td>
+                                    <td>{{ $o_report->created_at }} <small class="text-muted">{{ $o_report->created_at->diffForHumans() }}</small></td>
                                     <td>
                                         <a href="{{ route('report.show', $o_report->id) }}"
                                             class="btn btn-primary btn-sm m-1">More</a>

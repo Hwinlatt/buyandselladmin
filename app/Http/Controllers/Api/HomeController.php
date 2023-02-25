@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Like;
 use App\Models\Post;
 use App\Models\SlideShow;
 use Illuminate\Http\Request;
@@ -15,6 +16,12 @@ class HomeController extends Controller
         $slides = SlideShow::all();
         $popular_posts = Post::orderBy('view', 'desc')->where('status', '1')->limit(8)->get()->each(function ($q) {
             $q->images = json_decode($q->images);
+            $like = Like::where('post_id', $q->id)->where('user_id', Auth::user()->id)->first();
+            if ($like) {
+                $q->like = true;
+            } else {
+                $q->like = false;
+            }
             return $q;
         });
         $data = [
@@ -39,11 +46,11 @@ class HomeController extends Controller
     {
         $post = Post::where('user_id', '!=', Auth::user()->id)
             ->where('status', '1')->where(function ($q) use ($key) {
-                foreach ($key as $k) {
-                    $q->orWhere('name', 'like', '%' . $k . '%');
-                    $q->orWhere('additional', 'like', '%' . $k . '%');
-                    $q->orWhere('description', 'like', '%' . $k . '%');
-                }
+            foreach ($key as $k) {
+                $q->orWhere('name', 'like', '%' . $k . '%');
+                $q->orWhere('additional', 'like', '%' . $k . '%');
+                $q->orWhere('description', 'like', '%' . $k . '%');
+            }
         })->orderBy('view', 'desc')->limit(16)->get()->each(function ($q) {
             $q->images = json_decode($q->images);
             return $q;

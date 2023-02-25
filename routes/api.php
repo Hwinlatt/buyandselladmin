@@ -29,10 +29,8 @@ Route::post('login', [AuthController::class, 'login']);
 Route::get('default/api', [DefaultApiController::class, 'defaultApi']);
 Route::post('user/reset_password', [UserController::class, 'resetPassword']);
 
-Route::get('home/view', [HomeController::class, 'index']);
-
 Route::middleware(['auth:sanctum'])->group(function () {
-
+    Route::get('home/view', [HomeController::class, 'index']);
     Route::post('home/view/for_you', [HomeController::class, 'for_you']);
 
     Route::get('email/verification-notification', [AuthController::class, 'sentVerification']);
@@ -41,21 +39,31 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //User
     Route::prefix('user')->group(function () {
         Route::get('', function (Request $request) {
+            if ($request->user()->role == 'suspend') {
+                abort(403,'Unauthorized');
+            }
             return response()->json($request->user(), 200);
-        });
+        })->name('user.info');
         Route::post('update', [UserController::class, 'update']);
         Route::post('update/profileImage', [UserController::class, 'updateImage']);
         Route::post('update/coverImage', [UserController::class, 'updateCoverImg']);
         Route::post('update/password', [UserController::class, 'updatePassword']);
+
+        // Make Login Session on Messenger
+        Route::post('messenger', [UserController::class, 'messenger']);
     });
     //View Profile
     Route::prefix('profile')->group(function () {
         Route::get('view/{id}', [ProfileController::class, 'index']);
+        Route::get('view/review/{id}', [ProfileController::class, 'show_review']);
+        Route::post('add/review', [ProfileController::class, 'add_review']); //rate_user_id,rating,description
+        Route::get('remove/review/{id}', [ProfileController::class, 'remove_review']); //rate_user_id
+        Route::get('follow/{id}', [ProfileController::class, 'follow']); //make follow and un_follow
     });
     //Posts Controls
     Route::prefix('posts')->group(function () {
         Route::get('info/{id}', [PostController::class, 'show']);
-        Route::get('category/{id}',[PostController::class,'post_by_category']);
+        Route::get('category/{id}', [PostController::class, 'post_by_category']);
         Route::get('search/{key}', [PostController::class, 'search']);
         Route::get('user/{id}/{limit}', [PostController::class, 'post_by_user']);
     });
@@ -64,7 +72,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('like_unlike/{id}', [LikeAndCommentController::class, 'like_unlike']); //post_id
         Route::get('count', [LikeAndCommentController::class, 'like_count']);
         Route::get('byUser/get', [LikeAndCommentController::class, 'like_byUser_get']);
-        Route::get('who_like/{id}',[LikeAndCommentController::class,'who_like']); //post_id
+        Route::get('who_like/{id}', [LikeAndCommentController::class, 'who_like']); //post_id
     });
     Route::prefix('comment')->group(function () {
         Route::get('get/{id}', [LikeAndCommentController::class, 'get_comment']); //post_id
@@ -82,6 +90,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('all_read', [NotificationController::class, 'all_read']);
         Route::post('destroy', [NotificationController::class, 'destroy']);
     });
+
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
