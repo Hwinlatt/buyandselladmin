@@ -36,7 +36,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('email/verification-notification', [AuthController::class, 'sentVerification']);
     Route::post('email/verification-notification', [AuthController::class, 'makeVerification']);
     Route::post('logout', [AuthController::class, 'logout']);
-    //User
+
+    Route::middleware('isSuspend')->group(function(){
+        //User
     Route::prefix('user')->group(function () {
         Route::get('', function (Request $request) {
             if ($request->user()->role == 'suspend') {
@@ -90,10 +92,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('all_read', [NotificationController::class, 'all_read']);
         Route::post('destroy', [NotificationController::class, 'destroy']);
     });
+    });
 
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', 'verified','isSuspend'])->group(function () {
     Route::prefix('post')->group(function () {
         Route::post('add', [PostController::class, 'store']);
         Route::get('my_posts', [PostController::class, 'index']);
